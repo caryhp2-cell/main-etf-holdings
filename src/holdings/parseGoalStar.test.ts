@@ -182,6 +182,40 @@ describe("parseGoalStarHoldings", () => {
     );
   });
 
+  it("throws a clear error when a holdings row has fewer cells than headers", () => {
+    const html = `
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+            <th>股數</th>
+            <th>權重</th>
+            <th>收盤價</th>
+            <th>漲跌</th>
+            <th>異動</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>台積電</td>
+            <td>1,234</td>
+            <td>15.67%</td>
+            <td>789.50</td>
+            <td>+1.23%</td>
+            <td>12</td>
+            <td>加碼</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    expect(() => parseGoalStarHoldings(html, parseOptions)).toThrow(
+      /Invalid Goal Star holdings row: expected 8 cells, received 7/
+    );
+  });
+
   it("throws a clear error for blank or invalid required numeric values", () => {
     const blankRequiredNumericHtml = `
       <table>

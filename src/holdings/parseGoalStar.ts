@@ -42,6 +42,12 @@ export function parseGoalStarHoldings(
         .find("td")
         .map((_, cell) => $(cell).text().trim())
         .get();
+      if (cells.length !== headers.length) {
+        throw new Error(
+          `Invalid Goal Star holdings row: expected ${headers.length} cells, received ${cells.length}`
+        );
+      }
+
       const value = (header: string) => cells[headers.indexOf(header)] ?? "";
 
       return {
