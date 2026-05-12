@@ -1,0 +1,163 @@
+{
+  "generatedAt": "2026-05-12T14:22:04.304Z",
+  "etfs": [
+    "00992A",
+    "00991A",
+    "00985A",
+    "00981A"
+  ],
+  "dates": [
+    "2026-05-05",
+    "2026-05-06",
+    "2026-05-07",
+    "2026-05-08",
+    "2026-05-11",
+    "2026-05-12"
+  ],
+  "files": [
+    {
+      "date": "2026-05-05",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-05/00992A.csv",
+      "rowCount": 48
+    },
+    {
+      "date": "2026-05-05",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-05/00991A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-05",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-05/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-05",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-05/00981A.csv",
+      "rowCount": 51
+    },
+    {
+      "date": "2026-05-06",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-06/00992A.csv",
+      "rowCount": 48
+    },
+    {
+      "date": "2026-05-06",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-06/00991A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-06",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-06/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-06",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-06/00981A.csv",
+      "rowCount": 51
+    },
+    {
+      "date": "2026-05-07",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-07/00992A.csv",
+      "rowCount": 47
+    },
+    {
+      "date": "2026-05-07",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-07/00991A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-07",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-07/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-07",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-07/00981A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-08",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-08/00992A.csv",
+      "rowCount": 46
+    },
+    {
+      "date": "2026-05-08",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-08/00991A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-08",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-08/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-08",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-08/00981A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-11",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-11/00992A.csv",
+      "rowCount": 46
+    },
+    {
+      "date": "2026-05-11",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-11/00991A.csv",
+      "rowCount": 51
+    },
+    {
+      "date": "2026-05-11",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-11/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-11",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-11/00981A.csv",
+      "rowCount": 51
+    },
+    {
+      "date": "2026-05-12",
+      "etfCode": "00992A",
+      "path": "/data/holdings/2026-05-12/00992A.csv",
+      "rowCount": 45
+    },
+    {
+      "date": "2026-05-12",
+      "etfCode": "00991A",
+      "path": "/data/holdings/2026-05-12/00991A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-12",
+      "etfCode": "00985A",
+      "path": "/data/holdings/2026-05-12/00985A.csv",
+      "rowCount": 50
+    },
+    {
+      "date": "2026-05-12",
+      "etfCode": "00981A",
+      "path": "/data/holdings/2026-05-12/00981A.csv",
+      "rowCount": 51
+    }
+  ]
+}
