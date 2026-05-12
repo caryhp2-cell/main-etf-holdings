@@ -16,6 +16,7 @@ interface TransformGoalStarApiItemsOptions {
   etfCode: EtfCode;
   sourceUrl: string;
   fetchedAt: string;
+  requestedDate: string;
 }
 
 const STATUS_BY_API_VALUE: Record<string, HoldingStatus> = {
@@ -29,20 +30,38 @@ export function transformGoalStarApiItems(
   items: GoalStarApiItem[],
   options: TransformGoalStarApiItemsOptions
 ): HoldingRow[] {
-  return items.map((item) => ({
-    date: parseRequiredString(item.date, "date"),
-    etfCode: options.etfCode,
-    symbol: parseRequiredString(item.stock_symbol, "stock_symbol"),
-    name: parseRequiredString(item.stock_name, "stock_name"),
-    shares: parseRequiredNumber(item.shares, "shares"),
-    weight: parseRequiredNumber(item.ratio, "ratio"),
-    closePrice: parseOptionalNumber(item.close, "close"),
-    changePercent: parseOptionalNumber(item.change, "change"),
-    shareDelta: parseOptionalNumber(item.diff, "diff"),
-    status: parseStatus(item.status),
-    sourceUrl: options.sourceUrl,
-    fetchedAt: options.fetchedAt,
-  }));
+  return items.map((item) => {
+    validateItemDate(item.date, options.requestedDate);
+
+    return {
+      date: options.requestedDate,
+      etfCode: options.etfCode,
+      symbol: parseRequiredString(item.stock_symbol, "stock_symbol"),
+      name: parseRequiredString(item.stock_name, "stock_name"),
+      shares: parseRequiredNumber(item.shares, "shares"),
+      weight: parseRequiredNumber(item.ratio, "ratio"),
+      closePrice: parseOptionalNumber(item.close, "close"),
+      changePercent: parseOptionalNumber(item.change, "change"),
+      shareDelta: parseOptionalNumber(item.diff, "diff"),
+      status: parseStatus(item.status),
+      sourceUrl: options.sourceUrl,
+      fetchedAt: options.fetchedAt,
+    };
+  });
+}
+
+function validateItemDate(value: unknown, requestedDate: string): void {
+  const itemDate = parseRequiredString(value, "date");
+
+  if (!isValidDateOnly(itemDate)) {
+    throw new Error(`Invalid required Goal Star API value for date: ${String(value)}`);
+  }
+
+  if (itemDate !== requestedDate) {
+    throw new Error(
+      `Goal Star API item date ${itemDate} did not match requested date ${requestedDate}`
+    );
+  }
 }
 
 function parseRequiredString(value: unknown, fieldName: string): string {
@@ -94,4 +113,13 @@ function parseStatus(value: unknown): HoldingStatus {
   }
 
   return STATUS_BY_API_VALUE[value] ?? "未知";
+}
+
+function isValidDateOnly(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }

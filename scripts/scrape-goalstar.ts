@@ -28,7 +28,7 @@ export function getRequestedDates(
     if (flags.from || flags.to) {
       throw new Error("Use either --today or --from/--to, not both.");
     }
-    return [formatLocalDate(now())];
+    return [formatTaiwanDate(now())];
   }
 
   if (!flags.from || !flags.to) {
@@ -54,6 +54,7 @@ export async function scrapeGoalStarHoldings({
         etfCode,
         sourceUrl,
         fetchedAt: now().toISOString(),
+        requestedDate: date,
       });
       const filePath = join(process.cwd(), "data", "holdings", date, `${etfCode}.csv`);
 
@@ -70,6 +71,7 @@ function parseRowsOrThrow(
     etfCode: EtfCode;
     sourceUrl: string;
     fetchedAt: string;
+    requestedDate: string;
   }
 ): HoldingRow[] {
   try {
@@ -140,12 +142,13 @@ function parseFlags(args: string[]): {
   return flags;
 }
 
-function formatLocalDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+function formatTaiwanDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
 
 function enumerateDateRange(from: string, to: string): string[] {

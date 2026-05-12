@@ -7,6 +7,7 @@ describe("transformGoalStarApiItems", () => {
     etfCode: "00992A" as const,
     sourceUrl: "https://goal-star.com/fund/00992A",
     fetchedAt: "2026-05-12T13:00:00.000Z",
+    requestedDate: "2026-05-12",
   };
 
   it("maps Goal Star API items to holding rows", () => {
@@ -110,5 +111,49 @@ describe("transformGoalStarApiItems", () => {
         options
       )
     ).toThrow(/Invalid required Goal Star API value for shares/);
+  });
+
+  it("throws when a Goal Star API item date does not match the requested date", () => {
+    expect(() =>
+      transformGoalStarApiItems(
+        [
+          {
+            date: "2026-05-11",
+            stock_symbol: "2330",
+            stock_name: "å°ç©é›»",
+            shares: 1761000,
+            ratio: "7.460000",
+            diff: 0,
+            status: "unchanged",
+            close: "2255.0000",
+            change: "0.8949",
+          },
+        ],
+        options
+      )
+    ).toThrow(
+      "Goal Star API item date 2026-05-11 did not match requested date 2026-05-12"
+    );
+  });
+
+  it("throws when a Goal Star API item date is not a valid YYYY-MM-DD date", () => {
+    expect(() =>
+      transformGoalStarApiItems(
+        [
+          {
+            date: "2026-02-30",
+            stock_symbol: "2330",
+            stock_name: "å°ç©é›»",
+            shares: 1761000,
+            ratio: "7.460000",
+            diff: 0,
+            status: "unchanged",
+            close: "2255.0000",
+            change: "0.8949",
+          },
+        ],
+        options
+      )
+    ).toThrow("Invalid required Goal Star API value for date: 2026-02-30");
   });
 });

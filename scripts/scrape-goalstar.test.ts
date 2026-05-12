@@ -9,6 +9,23 @@ describe("getRequestedDates", () => {
     ).toEqual(["2026-05-12"]);
   });
 
+  it("formats --today using the Taiwan market date", () => {
+    const originalTimeZone = process.env.TZ;
+    process.env.TZ = "UTC";
+
+    try {
+      expect(
+        getRequestedDates(["--today"], () => new Date("2026-05-11T16:30:00.000Z"))
+      ).toEqual(["2026-05-12"]);
+    } finally {
+      if (originalTimeZone === undefined) {
+        delete process.env.TZ;
+      } else {
+        process.env.TZ = originalTimeZone;
+      }
+    }
+  });
+
   it("iterates inclusive calendar dates from --from to --to", () => {
     expect(
       getRequestedDates(["--from", "2026-05-01", "--to", "2026-05-03"])
