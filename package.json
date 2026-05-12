@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "vitest run",
     "scrape:today": "tsx scripts/scrape-goalstar.ts --today",
     "scrape:range": "tsx scripts/scrape-goalstar.ts",
@@ -20,12 +20,15 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "latest",
     "@types/node": "latest",
     "@types/papaparse": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "eslint": "latest",
     "tsx": "latest",
     "typescript": "latest",
+    "typescript-eslint": "latest",
     "vitest": "latest"
   }
 }
