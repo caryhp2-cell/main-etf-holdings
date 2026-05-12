@@ -1,16 +1,21 @@
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 
-import { parseGoalStarHoldings } from "../src/holdings/parseGoalStar";
+import {
+  transformGoalStarApiItems,
+  type GoalStarApiItem,
+} from "../src/holdings/transformGoalStarApi";
 import { ETF_CODES, type EtfCode, type HoldingRow } from "../src/holdings/types";
 import { writeHoldingsCsv } from "../src/holdings/writeCsv";
 
 const GOAL_STAR_BASE_URL = "https://goal-star.com/fund";
+const GOAL_STAR_API_BASE_URL = "https://goal-star.com/api/funds";
 
 interface ScrapeOptions {
   dates: string[];
-  fetchHtml?: (url: string) => Promise<string>;
+  fetchJson?: (url: string) => Promise<unknown>;
   now?: () => Date;
+  writeCsv?: (filePath: string, rows: HoldingRow[]) => Promise<void>;
 }
 
 export function getRequestedDates(
@@ -35,14 +40,16 @@ export function getRequestedDates(
 
 export async function scrapeGoalStarHoldings({
   dates,
-  fetchHtml = fetchGoalStarHtml,
+  fetchJson = fetchGoalStarJson,
   now = () => new Date(),
+  writeCsv = writeHoldingsCsv,
 }: ScrapeOptions): Promise<void> {
   for (const date of dates) {
     for (const etfCode of ETF_CODES) {
       const sourceUrl = goalStarFundUrl(etfCode);
-      const html = await fetchHtml(sourceUrl);
-      const rows = parseRowsOrThrow(html, {
+      const apiUrl = goalStarSharesApiUrl(etfCode, date);
+      const payload = await fetchJson(apiUrl);
+      const rows = parseRowsOrThrow(payload, {
         date,
         etfCode,
         sourceUrl,
@@ -50,14 +57,14 @@ export async function scrapeGoalStarHoldings({
       });
       const filePath = join(process.cwd(), "data", "holdings", date, `${etfCode}.csv`);
 
-      await writeHoldingsCsv(filePath, rows);
+      await writeCsv(filePath, rows);
       console.log(`Wrote ${rows.length} rows to ${filePath}`);
     }
   }
 }
 
 function parseRowsOrThrow(
-  html: string,
+  payload: unknown,
   options: {
     date: string;
     etfCode: EtfCode;
@@ -66,9 +73,9 @@ function parseRowsOrThrow(
   }
 ): HoldingRow[] {
   try {
-    const rows = parseGoalStarHoldings(html, options);
+    const rows = transformGoalStarApiItems(parseApiItems(payload), options);
     if (rows.length === 0) {
-      throw new Error("Parsed holdings table contained zero rows.");
+      throw new Error("Goal Star API payload contained zero items.");
     }
     return rows;
   } catch (error) {
@@ -77,18 +84,35 @@ function parseRowsOrThrow(
   }
 }
 
-async function fetchGoalStarHtml(url: string): Promise<string> {
+function parseApiItems(payload: unknown): GoalStarApiItem[] {
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("items" in payload) ||
+    !Array.isArray(payload.items)
+  ) {
+    throw new Error("Goal Star API payload missing items array.");
+  }
+
+  return payload.items as GoalStarApiItem[];
+}
+
+async function fetchGoalStarJson(url: string): Promise<unknown> {
   const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
   }
 
-  return response.text();
+  return response.json();
 }
 
 function goalStarFundUrl(etfCode: EtfCode): string {
   return `${GOAL_STAR_BASE_URL}/${etfCode}`;
+}
+
+function goalStarSharesApiUrl(etfCode: EtfCode, date: string): string {
+  return `${GOAL_STAR_API_BASE_URL}/${etfCode}/shares?date=${date}`;
 }
 
 function parseFlags(args: string[]): {
