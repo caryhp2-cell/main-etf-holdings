@@ -11,9 +11,9 @@ export interface HoldingRow {
   name: string;
   shares: number;
   weight: number;
-  closePrice: number;
-  changePercent: number;
-  shareDelta: number;
+  closePrice: number | null;
+  changePercent: number | null;
+  shareDelta: number | null;
   status: HoldingStatus;
   sourceUrl: string;
   fetchedAt: string;

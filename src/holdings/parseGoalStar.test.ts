@@ -4,6 +4,13 @@ import { parseGoalStarHoldings } from "./parseGoalStar";
 import { ETF_CODES } from "./types";
 
 describe("parseGoalStarHoldings", () => {
+  const parseOptions = {
+    date: "2026-05-12",
+    etfCode: "00992A" as const,
+    sourceUrl: "https://www.wantgoo.com/etf/00992A/constituent",
+    fetchedAt: "2026-05-12T13:00:00.000Z",
+  };
+
   it("parses Goal Star screenshot-style holdings table rows", () => {
     const html = `
       <table>
@@ -44,15 +51,9 @@ describe("parseGoalStarHoldings", () => {
       </table>
     `;
 
-    const fetchedAt = "2026-05-12T13:00:00.000Z";
-    const sourceUrl = "https://www.wantgoo.com/etf/00992A/constituent";
+    const { fetchedAt, sourceUrl } = parseOptions;
 
-    const rows = parseGoalStarHoldings(html, {
-      date: "2026-05-12",
-      etfCode: "00992A",
-      sourceUrl,
-      fetchedAt,
-    });
+    const rows = parseGoalStarHoldings(html, parseOptions);
 
     expect(ETF_CODES).toEqual(["00992A", "00991A", "00985A", "00981A"]);
     expect(rows).toEqual([
@@ -85,5 +86,177 @@ describe("parseGoalStarHoldings", () => {
         fetchedAt,
       },
     ]);
+  });
+
+  it("selects the table containing all required holdings headers", () => {
+    const html = `
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SHOULD_NOT_PARSE</td>
+            <td>Summary row</td>
+          </tr>
+        </tbody>
+      </table>
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+            <th>股數</th>
+            <th>權重</th>
+            <th>收盤價</th>
+            <th>漲跌</th>
+            <th>異動</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2330</td>
+            <td>台積電</td>
+            <td>1,234</td>
+            <td>15.67%</td>
+            <td>-</td>
+            <td></td>
+            <td>-</td>
+            <td>不變</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    const rows = parseGoalStarHoldings(html, parseOptions);
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      symbol: "2330",
+      name: "台積電",
+      shares: 1234,
+      weight: 15.67,
+      closePrice: null,
+      changePercent: null,
+      shareDelta: null,
+      status: "不變",
+    });
+  });
+
+  it("throws a clear error when a required holdings header is missing or renamed", () => {
+    const html = `
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+            <th>持股數</th>
+            <th>權重</th>
+            <th>收盤價</th>
+            <th>漲跌</th>
+            <th>異動</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2330</td>
+            <td>台積電</td>
+            <td>1,234</td>
+            <td>15.67%</td>
+            <td>789.50</td>
+            <td>+1.23%</td>
+            <td>12</td>
+            <td>加碼</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    expect(() => parseGoalStarHoldings(html, parseOptions)).toThrow(
+      /Missing required Goal Star holdings table header: 股數/
+    );
+  });
+
+  it("throws a clear error for blank or invalid required numeric values", () => {
+    const blankRequiredNumericHtml = `
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+            <th>股數</th>
+            <th>權重</th>
+            <th>收盤價</th>
+            <th>漲跌</th>
+            <th>異動</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2330</td>
+            <td>台積電</td>
+            <td></td>
+            <td>15.67%</td>
+            <td>789.50</td>
+            <td>+1.23%</td>
+            <td>12</td>
+            <td>加碼</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    const invalidRequiredNumericHtml = blankRequiredNumericHtml.replace(
+      "<td></td>",
+      "<td>not a number</td>"
+    );
+
+    expect(() =>
+      parseGoalStarHoldings(blankRequiredNumericHtml, parseOptions)
+    ).toThrow(/Invalid required numeric value for 股數/);
+    expect(() =>
+      parseGoalStarHoldings(invalidRequiredNumericHtml, parseOptions)
+    ).toThrow(/Invalid required numeric value for 股數/);
+  });
+
+  it("throws for invalid nonblank optional numeric values", () => {
+    const html = `
+      <table>
+        <thead>
+          <tr>
+            <th>代號</th>
+            <th>名稱</th>
+            <th>股數</th>
+            <th>權重</th>
+            <th>收盤價</th>
+            <th>漲跌</th>
+            <th>異動</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2330</td>
+            <td>台積電</td>
+            <td>1,234</td>
+            <td>15.67%</td>
+            <td>pending</td>
+            <td>+1.23%</td>
+            <td>12</td>
+            <td>加碼</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    expect(() => parseGoalStarHoldings(html, parseOptions)).toThrow(
+      /Invalid optional numeric value for 收盤價/
+    );
   });
 });
