@@ -1,8 +1,11 @@
 import type { EtfCode, HoldingRow, HoldingStatus } from "../holdings/types";
+import type { HoldingsSort, SortKey } from "../holdings/sortHoldings";
 
 interface EtfHoldingsColumnProps {
   etfCode: EtfCode;
   rows: HoldingRow[];
+  sort: HoldingsSort;
+  onSort: (key: SortKey) => void;
 }
 
 const STATUS_CLASS: Record<HoldingStatus, string> = {
@@ -13,7 +16,7 @@ const STATUS_CLASS: Record<HoldingStatus, string> = {
   未知: "status-unknown",
 };
 
-export function EtfHoldingsColumn({ etfCode, rows }: EtfHoldingsColumnProps) {
+export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsColumnProps) {
   const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
   const additions = rows.filter((row) => row.status === "新增" || row.status === "加碼").length;
   const reductions = rows.filter((row) => row.status === "減碼").length;
@@ -52,12 +55,16 @@ export function EtfHoldingsColumn({ etfCode, rows }: EtfHoldingsColumnProps) {
               <tr>
                 <th>代號</th>
                 <th>名稱</th>
-                <th>股數</th>
-                <th>權重</th>
+                <SortableHeader label="權重" sortKey="weight" activeSort={sort} onSort={onSort} />
                 <th>收盤價</th>
-                <th>漲跌</th>
+                <SortableHeader
+                  label="漲跌"
+                  sortKey="changePercent"
+                  activeSort={sort}
+                  onSort={onSort}
+                />
                 <th>異動</th>
-                <th>狀態</th>
+                <SortableHeader label="狀態" sortKey="status" activeSort={sort} onSort={onSort} />
               </tr>
             </thead>
             <tbody>
@@ -65,7 +72,6 @@ export function EtfHoldingsColumn({ etfCode, rows }: EtfHoldingsColumnProps) {
                 <tr key={`${row.etfCode}-${row.symbol}`}>
                   <td className="symbol">{row.symbol}</td>
                   <td>{row.name}</td>
-                  <td className="numeric">{formatInteger(row.shares)}</td>
                   <td className="numeric">{row.weight.toFixed(2)}%</td>
                   <td className={priceClass(row.closePrice)}>{formatNumber(row.closePrice)}</td>
                   <td className={changeClass(row.changePercent)}>
@@ -82,6 +88,30 @@ export function EtfHoldingsColumn({ etfCode, rows }: EtfHoldingsColumnProps) {
         </div>
       )}
     </section>
+  );
+}
+
+function SortableHeader({
+  label,
+  sortKey,
+  activeSort,
+  onSort,
+}: {
+  label: string;
+  sortKey: SortKey;
+  activeSort: HoldingsSort;
+  onSort: (key: SortKey) => void;
+}) {
+  const isActive = activeSort.key === sortKey;
+  const arrow = isActive ? (activeSort.direction === "desc" ? "↓" : "↑") : "↕";
+
+  return (
+    <th>
+      <button className="sort-button" type="button" onClick={() => onSort(sortKey)}>
+        <span>{label}</span>
+        <span aria-hidden="true">{arrow}</span>
+      </button>
+    </th>
   );
 }
 

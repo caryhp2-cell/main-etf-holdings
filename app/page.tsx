@@ -1,6 +1,6 @@
 import { DateSelector } from "../src/components/DateSelector";
 import { DownloadPanel } from "../src/components/DownloadPanel";
-import { EtfHoldingsColumn } from "../src/components/EtfHoldingsColumn";
+import { HoldingsDashboard } from "../src/components/HoldingsDashboard";
 import { loadHoldingsCsv } from "../src/holdings/loadCsv";
 import { loadManifest } from "../src/holdings/loadManifest";
 import { ETF_CODES, type EtfCode } from "../src/holdings/types";
@@ -31,15 +31,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
       <DownloadPanel files={manifest.files} selectedDate={selectedDate ?? ""} />
 
-      <section className="holdings-grid" aria-label="ETF holdings comparison">
-        {ETF_CODES.map((etfCode) => (
-          <EtfHoldingsColumn
-            key={etfCode}
-            etfCode={etfCode}
-            rows={holdingsByEtf[etfCode]}
-          />
-        ))}
-      </section>
+      <HoldingsDashboard holdingsByEtf={holdingsByEtf} />
     </main>
   );
 }
