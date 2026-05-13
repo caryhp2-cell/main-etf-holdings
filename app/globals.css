@@ -30,7 +30,7 @@ body {
 
 .page-shell {
   min-height: 100vh;
-  padding: 24px;
+  padding: 22px 28px;
 }
 
 .page-header {
@@ -39,7 +39,8 @@ body {
   gap: 24px;
   justify-content: space-between;
   margin: 0 auto 16px;
-  max-width: 1680px;
+  max-width: 2400px;
+  width: 100%;
 }
 
 .eyebrow {
@@ -97,8 +98,9 @@ p {
   gap: 16px;
   justify-content: space-between;
   margin: 0 auto 16px;
-  max-width: 1680px;
+  max-width: 2400px;
   padding: 12px 14px;
+  width: 100%;
 }
 
 .download-options {
@@ -127,10 +129,11 @@ p {
 
 .holdings-grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin: 0 auto;
-  max-width: 1680px;
+  max-width: 2400px;
+  width: 100%;
 }
 
 .etf-column {
@@ -146,8 +149,8 @@ p {
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
-  min-height: 72px;
-  padding: 12px;
+  min-height: 66px;
+  padding: 10px 12px;
 }
 
 .column-summary dl {
@@ -176,12 +179,14 @@ p {
 
 .table-wrap {
   max-height: 68vh;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 table {
   border-collapse: collapse;
-  min-width: 640px;
+  min-width: 0;
+  table-layout: fixed;
   width: 100%;
 }
 
@@ -189,10 +194,48 @@ th,
 td {
   border-bottom: 1px solid var(--line);
   color: #36547b;
-  font-size: 0.8125rem;
-  padding: 10px 12px;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  overflow: hidden;
+  padding: 9px 7px;
   text-align: left;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+  width: 12%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 18%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  width: 13%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 16%;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 13%;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 16%;
+}
+
+th:nth-child(7),
+td:nth-child(7) {
+  width: 12%;
 }
 
 th {
@@ -213,8 +256,9 @@ th {
   display: inline-flex;
   font: inherit;
   font-weight: 800;
-  gap: 5px;
+  gap: 3px;
   padding: 0;
+  max-width: 100%;
 }
 
 .numeric {
@@ -249,7 +293,7 @@ th {
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1;
-  padding: 5px 7px;
+  padding: 4px 6px;
 }
 
 .status-new {
