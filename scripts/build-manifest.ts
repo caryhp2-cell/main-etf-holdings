@@ -67,11 +67,46 @@ export async function writeHoldingsManifest(
   const rootDir = options.rootDir ?? process.cwd();
   const manifest = await buildHoldingsManifest({ ...options, rootDir });
   const outputPath = join(rootDir, "data", "manifest.json");
+  const stableManifest = await preserveGeneratedAtIfUnchanged(outputPath, manifest);
 
   await mkdir(join(rootDir, "data"), { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  await writeFile(outputPath, `${JSON.stringify(stableManifest, null, 2)}\n`, "utf8");
 
   return outputPath;
+}
+
+async function preserveGeneratedAtIfUnchanged(
+  outputPath: string,
+  nextManifest: HoldingsManifest
+): Promise<HoldingsManifest> {
+  if (!(await fileExists(outputPath))) {
+    return nextManifest;
+  }
+
+  const previous = JSON.parse(await readFile(outputPath, "utf8")) as HoldingsManifest;
+  if (manifestContentEquals(previous, nextManifest)) {
+    return { ...nextManifest, generatedAt: previous.generatedAt };
+  }
+
+  return nextManifest;
+}
+
+function manifestContentEquals(
+  previous: HoldingsManifest,
+  nextManifest: HoldingsManifest
+): boolean {
+  const previousContent = withoutGeneratedAt(previous);
+  const nextContent = withoutGeneratedAt(nextManifest);
+
+  return JSON.stringify(previousContent) === JSON.stringify(nextContent);
+}
+
+function withoutGeneratedAt(manifest: HoldingsManifest): Omit<HoldingsManifest, "generatedAt"> {
+  return {
+    etfs: manifest.etfs,
+    dates: manifest.dates,
+    files: manifest.files,
+  };
 }
 
 async function readDateDirs(holdingsDir: string): Promise<string[]> {

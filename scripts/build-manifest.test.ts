@@ -85,6 +85,25 @@ describe("writeHoldingsManifest", () => {
       )}\n`
     );
   });
+
+  it("preserves generatedAt when manifest content is unchanged", async () => {
+    const rootDir = await mkdtemp(join(tmpdir(), "holdings-manifest-"));
+
+    await writeCsv(rootDir, "2026-05-12", "00992A", ["a"]);
+
+    const firstOutputPath = await writeHoldingsManifest({
+      rootDir,
+      generatedAt: new Date("2026-05-12T14:30:00.000Z"),
+    });
+    const first = await readFile(firstOutputPath, "utf8");
+
+    const secondOutputPath = await writeHoldingsManifest({
+      rootDir,
+      generatedAt: new Date("2026-05-13T00:00:00.000Z"),
+    });
+
+    await expect(readFile(secondOutputPath, "utf8")).resolves.toBe(first);
+  });
 });
 
 async function writeCsv(
