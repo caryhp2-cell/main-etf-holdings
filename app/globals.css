@@ -289,8 +289,9 @@ tbody tr:hover {
   font: inherit;
   font-weight: 800;
   gap: 3px;
+  justify-content: inherit;
   padding: 0;
-  max-width: 100%;
+  width: 100%;
 }
 
 .numeric {

@@ -60,13 +60,20 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
               <tr>
                 <th>代號</th>
                 <th>名稱</th>
-                <SortableHeader label="權重" sortKey="weight" activeSort={sort} onSort={onSort} />
-                <th>收盤價</th>
+                <SortableHeader
+                  label="權重"
+                  sortKey="weight"
+                  activeSort={sort}
+                  onSort={onSort}
+                  align="right"
+                />
+                <th className="numeric">收盤價</th>
                 <SortableHeader
                   label="漲跌"
                   sortKey="changePercent"
                   activeSort={sort}
                   onSort={onSort}
+                  align="right"
                 />
                 <th className="numeric">異動張數</th>
                 <SortableHeader label="狀態" sortKey="status" activeSort={sort} onSort={onSort} />
@@ -103,17 +110,19 @@ function SortableHeader({
   sortKey,
   activeSort,
   onSort,
+  align = "left",
 }: {
   label: string;
   sortKey: SortKey;
   activeSort: HoldingsSort;
   onSort: (key: SortKey) => void;
+  align?: "left" | "right";
 }) {
   const isActive = activeSort.key === sortKey;
   const arrow = isActive ? (activeSort.direction === "desc" ? "↓" : "↑") : "↕";
 
   return (
-    <th>
+    <th className={align === "right" ? "numeric" : undefined}>
       <button className="sort-button" type="button" onClick={() => onSort(sortKey)}>
         <span>{label}</span>
         <span aria-hidden="true">{arrow}</span>
