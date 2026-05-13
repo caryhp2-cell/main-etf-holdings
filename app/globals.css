@@ -298,6 +298,10 @@ tbody tr:hover {
   text-align: right;
 }
 
+.numeric .sort-button {
+  justify-content: flex-end;
+}
+
 .symbol,
 .value-green {
   color: var(--green);
