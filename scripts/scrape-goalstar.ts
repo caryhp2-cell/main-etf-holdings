@@ -45,21 +45,39 @@ export async function scrapeGoalStarHoldings({
   writeCsv = writeHoldingsCsv,
 }: ScrapeOptions): Promise<void> {
   for (const date of dates) {
+    const failures: string[] = [];
+    let writtenFiles = 0;
+
     for (const etfCode of ETF_CODES) {
       const sourceUrl = goalStarFundUrl(etfCode);
       const apiUrl = goalStarSharesApiUrl(etfCode, date);
       const payload = await fetchJson(apiUrl);
-      const rows = parseRowsOrThrow(payload, {
-        date,
-        etfCode,
-        sourceUrl,
-        fetchedAt: now().toISOString(),
-        requestedDate: date,
-      });
+      let rows: HoldingRow[];
+
+      try {
+        rows = parseRowsOrThrow(payload, {
+          date,
+          etfCode,
+          sourceUrl,
+          fetchedAt: now().toISOString(),
+          requestedDate: date,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        failures.push(message);
+        console.warn(message);
+        continue;
+      }
+
       const filePath = join(process.cwd(), "data", "holdings", date, `${etfCode}.csv`);
 
       await writeCsv(filePath, rows);
+      writtenFiles += 1;
       console.log(`Wrote ${rows.length} rows to ${filePath}`);
+    }
+
+    if (writtenFiles === 0) {
+      throw new Error(failures.join("\n") || `No holdings rows written for ${date}.`);
     }
   }
 }

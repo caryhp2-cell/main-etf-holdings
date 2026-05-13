@@ -85,6 +85,46 @@ describe("scrapeGoalStarHoldings", () => {
     );
   });
 
+  it("continues writing available ETF data when one Goal Star API response is temporarily empty", async () => {
+    const fetchJson = vi.fn(async (url: string) => {
+      if (url.includes("00991A")) {
+        return { items: [] };
+      }
+
+      return {
+        items: [
+          {
+            date: "2026-05-13",
+            stock_symbol: "2330",
+            stock_name: "台積電",
+            shares: 1761000,
+            ratio: "7.460000",
+            diff: 0,
+            status: "unchanged",
+            close: "2255.0000",
+            change: "0.8949",
+          },
+        ],
+      };
+    });
+    const writeCsv = vi.fn();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    await scrapeGoalStarHoldings({
+      dates: ["2026-05-13"],
+      fetchJson,
+      writeCsv,
+      now: () => new Date("2026-05-13T13:00:00.000Z"),
+    });
+
+    expect(writeCsv).toHaveBeenCalledTimes(2);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("No holdings rows parsed for 00991A")
+    );
+
+    warn.mockRestore();
+  });
+
   it("fails loudly when Goal Star API items are empty", async () => {
     await expect(
       scrapeGoalStarHoldings({
