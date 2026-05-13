@@ -1,6 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { formatShareDeltaLots } from "./formatHoldingValues";
+import { formatChangePercent, formatShareDeltaLots } from "./formatHoldingValues";
+
+describe("formatChangePercent", () => {
+  it("rounds percentage values to 2 decimal places", () => {
+    expect(formatChangePercent(2.6667)).toBe("2.67");
+    expect(formatChangePercent(-0.2915)).toBe("-0.29");
+  });
+
+  it("keeps trailing zeros so percentages align visually", () => {
+    expect(formatChangePercent(0.2)).toBe("0.20");
+  });
+
+  it("uses a dash when change percent is unavailable", () => {
+    expect(formatChangePercent(null)).toBe("-");
+  });
+});
 
 describe("formatShareDeltaLots", () => {
   it("converts Goal Star share deltas into Taiwan trading lots", () => {

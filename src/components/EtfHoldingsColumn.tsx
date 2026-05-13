@@ -1,6 +1,6 @@
 import type { EtfCode, HoldingRow, HoldingStatus } from "../holdings/types";
 import type { HoldingsSort, SortKey } from "../holdings/sortHoldings";
-import { formatShareDeltaLots } from "../holdings/formatHoldingValues";
+import { formatChangePercent, formatShareDeltaLots } from "../holdings/formatHoldingValues";
 
 interface EtfHoldingsColumnProps {
   etfCode: EtfCode;
@@ -69,7 +69,7 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
                 />
                 <th className="numeric">收盤價</th>
                 <SortableHeader
-                  label="漲跌"
+                  label="漲跌（%）"
                   sortKey="changePercent"
                   activeSort={sort}
                   onSort={onSort}
@@ -87,7 +87,7 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
                   <td className="numeric">{row.weight.toFixed(2)}%</td>
                   <td className={priceClass(row.closePrice)}>{formatNumber(row.closePrice)}</td>
                   <td className={changeClass(row.changePercent)}>
-                    {formatNumber(row.changePercent)}
+                    {formatChangePercent(row.changePercent)}
                   </td>
                   <td className={deltaClass(row.shareDelta)}>
                     {formatShareDeltaLots(row.shareDelta)}
