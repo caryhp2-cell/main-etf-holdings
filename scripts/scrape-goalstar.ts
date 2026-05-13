@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { access } from "node:fs/promises";
 
 import {
   transformGoalStarApiItems,
@@ -13,6 +14,8 @@ const GOAL_STAR_API_BASE_URL = "https://goal-star.com/api/funds";
 
 interface ScrapeOptions {
   dates: string[];
+  missingOnly?: boolean;
+  fileExists?: (filePath: string) => Promise<boolean>;
   fetchJson?: (url: string) => Promise<unknown>;
   now?: () => Date;
   writeCsv?: (filePath: string, rows: HoldingRow[]) => Promise<void>;
@@ -24,11 +27,11 @@ export function getRequestedDates(
 ): string[] {
   const flags = parseFlags(args);
 
-  if (flags.today) {
-    if (flags.from || flags.to) {
-      throw new Error("Use either --today or --from/--to, not both.");
+  if (flags.today || flags.marketDate) {
+    if (flags.from || flags.to || (flags.today && flags.marketDate)) {
+      throw new Error("Use only one date mode: --today, --market-date, or --from/--to.");
     }
-    return [formatTaiwanDate(now())];
+    return [flags.marketDate ? getMarketRetryDate(now()) : formatTaiwanDate(now())];
   }
 
   if (!flags.from || !flags.to) {
@@ -40,21 +43,32 @@ export function getRequestedDates(
 
 export async function scrapeGoalStarHoldings({
   dates,
+  missingOnly = false,
+  fileExists = pathExists,
   fetchJson = fetchGoalStarJson,
   now = () => new Date(),
   writeCsv = writeHoldingsCsv,
 }: ScrapeOptions): Promise<void> {
   for (const date of dates) {
     const failures: string[] = [];
+    let skippedFiles = 0;
     let writtenFiles = 0;
 
     for (const etfCode of ETF_CODES) {
+      const filePath = join(process.cwd(), "data", "holdings", date, `${etfCode}.csv`);
+
+      if (missingOnly && (await fileExists(filePath))) {
+        skippedFiles += 1;
+        console.log(`Skipped existing ${filePath}`);
+        continue;
+      }
+
       const sourceUrl = goalStarFundUrl(etfCode);
       const apiUrl = goalStarSharesApiUrl(etfCode, date);
-      const payload = await fetchJson(apiUrl);
       let rows: HoldingRow[];
 
       try {
+        const payload = await fetchJson(apiUrl);
         rows = parseRowsOrThrow(payload, {
           date,
           etfCode,
@@ -69,14 +83,12 @@ export async function scrapeGoalStarHoldings({
         continue;
       }
 
-      const filePath = join(process.cwd(), "data", "holdings", date, `${etfCode}.csv`);
-
       await writeCsv(filePath, rows);
       writtenFiles += 1;
       console.log(`Wrote ${rows.length} rows to ${filePath}`);
     }
 
-    if (writtenFiles === 0) {
+    if (writtenFiles === 0 && skippedFiles === 0) {
       throw new Error(failures.join("\n") || `No holdings rows written for ${date}.`);
     }
   }
@@ -137,15 +149,31 @@ function goalStarSharesApiUrl(etfCode: EtfCode, date: string): string {
 
 function parseFlags(args: string[]): {
   today: boolean;
+  marketDate: boolean;
+  missingOnly: boolean;
   from?: string;
   to?: string;
 } {
-  const flags: { today: boolean; from?: string; to?: string } = { today: false };
+  const flags: {
+    today: boolean;
+    marketDate: boolean;
+    missingOnly: boolean;
+    from?: string;
+    to?: string;
+  } = {
+    today: false,
+    marketDate: false,
+    missingOnly: false,
+  };
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--today") {
       flags.today = true;
+    } else if (arg === "--market-date") {
+      flags.marketDate = true;
+    } else if (arg === "--missing-only") {
+      flags.missingOnly = true;
     } else if (arg === "--from") {
       flags.from = args[index + 1];
       index += 1;
@@ -158,6 +186,21 @@ function parseFlags(args: string[]): {
   }
 
   return flags;
+}
+
+function getMissingOnly(args: string[]): boolean {
+  return parseFlags(args).missingOnly;
+}
+
+export function getMarketRetryDate(now: Date): string {
+  const parts = getTaiwanDateTimeParts(now);
+  const date = parseDateOnly(parts.date, "Taiwan date");
+
+  if (parts.hour >= 18) {
+    return parts.date;
+  }
+
+  return formatDateOnly(previousBusinessDay(date));
 }
 
 function formatTaiwanDate(date: Date): string {
@@ -208,9 +251,58 @@ function addUtcDays(date: Date, days: number): Date {
   return next;
 }
 
+function previousBusinessDay(date: Date): Date {
+  let cursor = addUtcDays(date, -1);
+
+  while (cursor.getUTCDay() === 0 || cursor.getUTCDay() === 6) {
+    cursor = addUtcDays(cursor, -1);
+  }
+
+  return cursor;
+}
+
+function formatDateOnly(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function getTaiwanDateTimeParts(date: Date): { date: string; hour: number } {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+
+  return {
+    date: `${part("year")}-${part("month")}-${part("day")}`,
+    hour: Number(part("hour")),
+  };
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      (error as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
+      return false;
+    }
+
+    throw error;
+  }
+}
+
 async function main(): Promise<void> {
-  const dates = getRequestedDates(process.argv.slice(2));
-  await scrapeGoalStarHoldings({ dates });
+  const args = process.argv.slice(2);
+  const dates = getRequestedDates(args);
+  await scrapeGoalStarHoldings({ dates, missingOnly: getMissingOnly(args) });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

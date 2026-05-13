@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "scrape:today": "tsx scripts/scrape-goalstar.ts --today",
+    "scrape:retry": "tsx scripts/scrape-goalstar.ts --market-date --missing-only",
     "scrape:range": "tsx scripts/scrape-goalstar.ts",
     "manifest": "tsx scripts/build-manifest.ts"
   },

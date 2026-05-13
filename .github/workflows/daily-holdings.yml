@@ -2,7 +2,11 @@ name: Daily ETF holdings
 
 on:
   schedule:
-    - cron: "30 10 * * 1-5"
+    # 18:30 and 21:30 Asia/Taipei, Monday-Friday.
+    - cron: "30 10,13 * * 1-5"
+    # 00:30, 03:30, and 06:30 Asia/Taipei, Tuesday-Saturday.
+    # These retry the previous Taiwan trading date, so filenames keep the market date.
+    - cron: "30 16,19,22 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -28,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Scrape Goal Star holdings
-        run: npm run scrape:today
+        run: npm run scrape:retry
 
       - name: Rebuild manifest
         run: npm run manifest
