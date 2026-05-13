@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { sortHoldingsRows, type HoldingsSort, type SortKey } from "../holdings/sortHoldings";
-import { ETF_CODES, type EtfCode, type HoldingRow } from "../holdings/types";
+import { DISPLAY_ETF_CODES, type EtfCode, type HoldingRow } from "../holdings/types";
 import { EtfHoldingsColumn } from "./EtfHoldingsColumn";
 
 interface HoldingsDashboardProps {
@@ -25,7 +25,7 @@ export function HoldingsDashboard({ holdingsByEtf }: HoldingsDashboardProps) {
 
   return (
     <section className="holdings-grid" aria-label="ETF holdings comparison">
-      {ETF_CODES.map((etfCode) => (
+      {DISPLAY_ETF_CODES.map((etfCode) => (
         <EtfHoldingsColumn
           key={etfCode}
           etfCode={etfCode}

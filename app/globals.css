@@ -103,21 +103,6 @@ p {
   width: 100%;
 }
 
-.download-options {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.download-options label {
-  align-items: center;
-  color: var(--muted);
-  display: inline-flex;
-  font-size: 0.8125rem;
-  gap: 6px;
-}
-
 .download-button {
   background: #dce5f2;
   border: 1px solid #c9d6e8;
@@ -130,7 +115,7 @@ p {
 .holdings-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0 auto;
   max-width: 2400px;
   width: 100%;

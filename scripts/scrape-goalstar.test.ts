@@ -43,7 +43,7 @@ describe("scrapeGoalStarHoldings", () => {
   it("fetches dated Goal Star API URLs and writes rows with public fund source URLs", async () => {
     const fetchJson = vi.fn(async (url: string) => {
       expect(url).toMatch(
-        /^https:\/\/goal-star\.com\/api\/funds\/(?:00992A|00991A|00985A|00981A)\/shares\?date=2026-05-12$/
+        /^https:\/\/goal-star\.com\/api\/funds\/(?:00981A|00992A|00991A)\/shares\?date=2026-05-12$/
       );
 
       return {
@@ -71,14 +71,14 @@ describe("scrapeGoalStarHoldings", () => {
       now: () => new Date("2026-05-12T13:00:00.000Z"),
     });
 
-    expect(fetchJson).toHaveBeenCalledTimes(4);
-    expect(writeCsv).toHaveBeenCalledTimes(4);
+    expect(fetchJson).toHaveBeenCalledTimes(3);
+    expect(writeCsv).toHaveBeenCalledTimes(3);
     expect(writeCsv).toHaveBeenCalledWith(
-      expect.stringContaining("00992A.csv"),
+      expect.stringContaining("00981A.csv"),
       [
         expect.objectContaining({
-          etfCode: "00992A",
-          sourceUrl: "https://goal-star.com/fund/00992A",
+          etfCode: "00981A",
+          sourceUrl: "https://goal-star.com/fund/00981A",
           status: "不變",
         }),
       ]
@@ -92,7 +92,7 @@ describe("scrapeGoalStarHoldings", () => {
         fetchJson: async () => ({ items: [] }),
         writeCsv: vi.fn(),
       })
-    ).rejects.toThrow(/No holdings rows parsed for 00992A/);
+    ).rejects.toThrow(/No holdings rows parsed for 00981A/);
   });
 
   it("fails loudly when Goal Star API payload is invalid", async () => {
@@ -102,6 +102,6 @@ describe("scrapeGoalStarHoldings", () => {
         fetchJson: async () => ({ rows: [] }),
         writeCsv: vi.fn(),
       })
-    ).rejects.toThrow(/No holdings rows parsed for 00992A/);
+    ).rejects.toThrow(/No holdings rows parsed for 00981A/);
   });
 });

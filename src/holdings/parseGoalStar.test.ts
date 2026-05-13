@@ -55,7 +55,7 @@ describe("parseGoalStarHoldings", () => {
 
     const rows = parseGoalStarHoldings(html, parseOptions);
 
-    expect(ETF_CODES).toEqual(["00992A", "00991A", "00985A", "00981A"]);
+    expect(ETF_CODES).toEqual(["00981A", "00992A", "00991A"]);
     expect(rows).toEqual([
       {
         date: "2026-05-12",

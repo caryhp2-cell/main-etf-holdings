@@ -1,13 +1,12 @@
 # Main ETF Holdings
 
-Main ETF Holdings is a Next.js dashboard for comparing daily Goal Star holdings across four Taiwan active ETFs:
+Main ETF Holdings is a Next.js dashboard for comparing daily Goal Star holdings across three Taiwan active ETFs:
 
+- `00981A`
 - `00992A`
 - `00991A`
-- `00985A`
-- `00981A`
 
-The site reads checked-in CSV snapshots, lets users switch dates, shows four ETF holdings tables side by side, and supports single or multi-file CSV downloads.
+The site reads checked-in CSV snapshots, lets users switch dates, shows three ETF holdings tables side by side, and downloads the latest 30 available days of CSV data.
 
 ## Data Source
 

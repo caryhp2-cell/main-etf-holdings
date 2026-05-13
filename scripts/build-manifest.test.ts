@@ -13,7 +13,7 @@ describe("buildHoldingsManifest", () => {
     await writeCsv(rootDir, "2026-05-12", "00981A", ["a", "b", "c"]);
     await writeCsv(rootDir, "2026-05-10", "00992A", ["a"]);
     await writeCsv(rootDir, "2026-05-12", "00992A", ["a", "b"]);
-    await writeCsv(rootDir, "2026-05-10", "00985A", []);
+    await writeCsv(rootDir, "2026-05-10", "00991A", []);
 
     const manifest = await buildHoldingsManifest({
       rootDir,
@@ -22,7 +22,7 @@ describe("buildHoldingsManifest", () => {
 
     expect(manifest).toEqual({
       generatedAt: "2026-05-12T14:30:00.000Z",
-      etfs: ["00992A", "00991A", "00985A", "00981A"],
+      etfs: ["00981A", "00992A", "00991A"],
       dates: ["2026-05-10", "2026-05-12"],
       files: [
         {
@@ -33,21 +33,21 @@ describe("buildHoldingsManifest", () => {
         },
         {
           date: "2026-05-10",
-          etfCode: "00985A",
-          path: "/data/holdings/2026-05-10/00985A.csv",
+          etfCode: "00991A",
+          path: "/data/holdings/2026-05-10/00991A.csv",
           rowCount: 0,
-        },
-        {
-          date: "2026-05-12",
-          etfCode: "00992A",
-          path: "/data/holdings/2026-05-12/00992A.csv",
-          rowCount: 2,
         },
         {
           date: "2026-05-12",
           etfCode: "00981A",
           path: "/data/holdings/2026-05-12/00981A.csv",
           rowCount: 3,
+        },
+        {
+          date: "2026-05-12",
+          etfCode: "00992A",
+          path: "/data/holdings/2026-05-12/00992A.csv",
+          rowCount: 2,
         },
       ],
     });
@@ -69,7 +69,7 @@ describe("writeHoldingsManifest", () => {
       `${JSON.stringify(
         {
           generatedAt: "2026-05-12T14:30:00.000Z",
-          etfs: ["00992A", "00991A", "00985A", "00981A"],
+          etfs: ["00981A", "00992A", "00991A"],
           dates: ["2026-05-12"],
           files: [
             {

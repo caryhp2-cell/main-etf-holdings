@@ -7,7 +7,7 @@ describe("loadManifest", () => {
     const manifest = loadManifest();
 
     expect(manifest).toHaveProperty("generatedAt");
-    expect(manifest.etfs).toEqual(["00992A", "00991A", "00985A", "00981A"]);
+    expect(manifest.etfs).toEqual(["00981A", "00992A", "00991A"]);
     expect(manifest.dates).toEqual([...manifest.dates].sort());
     expect(manifest.files.every((file) => file.path.startsWith("/data/holdings/"))).toBe(
       true

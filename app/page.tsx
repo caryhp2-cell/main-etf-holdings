@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <DateSelector dates={manifest.dates} selectedDate={selectedDate ?? ""} />
       </header>
 
-      <DownloadPanel files={manifest.files} selectedDate={selectedDate ?? ""} />
+      <DownloadPanel files={manifest.files} />
 
       <HoldingsDashboard holdingsByEtf={holdingsByEtf} />
     </main>
