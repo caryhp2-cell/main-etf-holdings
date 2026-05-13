@@ -25,3 +25,5 @@ pnpm-debug.log*
 # local files
 .DS_Store
 Thumbs.db
+
+.vercel
