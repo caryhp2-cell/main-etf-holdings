@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseGoalStarHoldings } from "./parseGoalStar";
-import { ETF_CODES } from "./types";
+import { DISPLAY_ETF_CODES, ETF_CODES } from "./types";
 
 describe("parseGoalStarHoldings", () => {
   const parseOptions = {
@@ -56,6 +56,7 @@ describe("parseGoalStarHoldings", () => {
     const rows = parseGoalStarHoldings(html, parseOptions);
 
     expect(ETF_CODES).toEqual(["00981A", "00992A", "00991A"]);
+    expect(DISPLAY_ETF_CODES).toEqual(["00991A", "00981A", "00992A"]);
     expect(rows).toEqual([
       {
         date: "2026-05-12",

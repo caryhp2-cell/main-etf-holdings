@@ -1,11 +1,13 @@
 :root {
   color-scheme: light;
-  --background: #f4f7fb;
-  --surface: #ffffff;
-  --line: #d9e2ef;
+  --background: #eef4f8;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.9);
+  --line: rgba(150, 169, 194, 0.34);
   --foreground: #13233a;
   --muted: #557095;
   --accent: #047857;
+  --accent-soft: rgba(4, 120, 87, 0.12);
   --blue: #1769ff;
   --red: #ff2f2f;
   --green: #00b85c;
@@ -23,23 +25,31 @@ body {
 }
 
 body {
-  background: var(--background);
+  background:
+    linear-gradient(135deg, rgba(232, 242, 249, 0.92), rgba(246, 250, 252, 0.9) 46%, rgba(230, 244, 239, 0.9)),
+    var(--background);
   color: var(--foreground);
   font-family: Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
 }
 
 .page-shell {
   min-height: 100vh;
-  padding: 22px 28px;
+  padding: 24px 28px 28px;
 }
 
 .page-header {
   align-items: end;
+  background: rgba(255, 255, 255, 0.46);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 10px;
+  box-shadow: 0 18px 52px rgba(44, 68, 94, 0.1);
   display: flex;
   gap: 24px;
   justify-content: space-between;
-  margin: 0 auto 14px;
+  margin: 0 auto 16px;
   max-width: 2400px;
+  padding: 14px 16px;
   width: 100%;
 }
 
@@ -87,7 +97,7 @@ p {
 
 .date-selector select {
   appearance: none;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.76);
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--foreground);
@@ -103,17 +113,24 @@ p {
 }
 
 .download-button {
-  background: #dce5f2;
-  border: 1px solid #c9d6e8;
+  background: #e6eef8;
+  border: 1px solid rgba(120, 145, 174, 0.36);
   border-radius: 6px;
-  color: #60728e;
+  box-shadow: 0 8px 18px rgba(55, 83, 112, 0.1);
+  color: #455d7d;
+  cursor: pointer;
   font-weight: 700;
   padding: 9px 14px;
 }
 
+.download-button:hover:not(:disabled) {
+  background: #dce9f7;
+  color: #17304f;
+}
+
 .holdings-grid {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0 auto;
   max-width: 2400px;
@@ -122,14 +139,36 @@ p {
 
 .etf-column {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 10px;
+  box-shadow: 0 20px 54px rgba(42, 63, 89, 0.12);
   min-width: 0;
   overflow: hidden;
+  position: relative;
+}
+
+.etf-column::before {
+  background: linear-gradient(90deg, rgba(23, 105, 255, 0.52), rgba(4, 120, 87, 0.48));
+  content: "";
+  display: block;
+  height: 3px;
+  width: 100%;
+}
+
+.etf-column-featured {
+  border-color: rgba(4, 120, 87, 0.3);
+  box-shadow: 0 24px 62px rgba(4, 120, 87, 0.14), 0 16px 42px rgba(42, 63, 89, 0.1);
+}
+
+.etf-column-featured::before {
+  background: linear-gradient(90deg, #047857, #1769ff);
+  height: 4px;
 }
 
 .column-summary {
   align-items: start;
+  background: rgba(255, 255, 255, 0.34);
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
@@ -223,12 +262,21 @@ td:nth-child(7) {
 }
 
 th {
-  background: var(--surface);
+  background: rgba(250, 253, 255, 0.88);
+  backdrop-filter: blur(12px);
   color: #17304f;
   font-weight: 800;
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+tbody tr {
+  transition: background 120ms ease, color 120ms ease;
+}
+
+tbody tr:hover {
+  background: rgba(23, 105, 255, 0.045);
 }
 
 .sort-button {

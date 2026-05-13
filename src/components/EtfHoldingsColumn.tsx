@@ -21,9 +21,13 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
   const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
   const additions = rows.filter((row) => row.status === "新增" || row.status === "加碼").length;
   const reductions = rows.filter((row) => row.status === "減碼").length;
+  const isFeatured = etfCode === "00981A";
 
   return (
-    <section className="etf-column" aria-labelledby={`etf-${etfCode}`}>
+    <section
+      className={`etf-column${isFeatured ? " etf-column-featured" : ""}`}
+      aria-labelledby={`etf-${etfCode}`}
+    >
       <div className="column-summary">
         <div>
           <h2 id={`etf-${etfCode}`}>{etfCode}</h2>
