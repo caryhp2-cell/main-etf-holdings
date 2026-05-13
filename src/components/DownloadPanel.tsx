@@ -37,11 +37,7 @@ export function DownloadPanel({ files }: DownloadPanelProps) {
   }
 
   return (
-    <section className="download-panel" aria-labelledby="download-title">
-      <div>
-        <h2 id="download-title">CSV 下載</h2>
-        <p>下載最近30天資料：00981A、00991A、00992A</p>
-      </div>
+    <div className="download-panel">
       <button
         className="download-button"
         type="button"
@@ -50,7 +46,7 @@ export function DownloadPanel({ files }: DownloadPanelProps) {
       >
         Download
       </button>
-    </section>
+    </div>
   );
 }
 

@@ -24,12 +24,13 @@ export default async function Home({ searchParams }: HomeProps) {
       <header className="page-header">
         <div>
           <p className="eyebrow">Goal Star daily holdings</p>
-          <h1>Main ETF Holdings</h1>
+          <div className="title-row">
+            <h1>Main ETF Holdings</h1>
+            <DateSelector dates={manifest.dates} selectedDate={selectedDate ?? ""} />
+          </div>
         </div>
-        <DateSelector dates={manifest.dates} selectedDate={selectedDate ?? ""} />
+        <DownloadPanel files={manifest.files} />
       </header>
-
-      <DownloadPanel files={manifest.files} />
 
       <HoldingsDashboard holdingsByEtf={holdingsByEtf} />
     </main>

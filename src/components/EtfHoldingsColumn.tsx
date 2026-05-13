@@ -64,7 +64,7 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
                   activeSort={sort}
                   onSort={onSort}
                 />
-                <th>異動張數</th>
+                <th className="numeric">異動張數</th>
                 <SortableHeader label="狀態" sortKey="status" activeSort={sort} onSort={onSort} />
               </tr>
             </thead>
