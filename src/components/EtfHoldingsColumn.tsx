@@ -1,5 +1,6 @@
 import type { EtfCode, HoldingRow, HoldingStatus } from "../holdings/types";
 import type { HoldingsSort, SortKey } from "../holdings/sortHoldings";
+import { formatShareDeltaLots } from "../holdings/formatHoldingValues";
 
 interface EtfHoldingsColumnProps {
   etfCode: EtfCode;
@@ -63,7 +64,7 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
                   activeSort={sort}
                   onSort={onSort}
                 />
-                <th>異動</th>
+                <th>異動張數</th>
                 <SortableHeader label="狀態" sortKey="status" activeSort={sort} onSort={onSort} />
               </tr>
             </thead>
@@ -77,7 +78,9 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
                   <td className={changeClass(row.changePercent)}>
                     {formatNumber(row.changePercent)}
                   </td>
-                  <td className={deltaClass(row.shareDelta)}>{formatInteger(row.shareDelta)}</td>
+                  <td className={deltaClass(row.shareDelta)}>
+                    {formatShareDeltaLots(row.shareDelta)}
+                  </td>
                   <td>
                     <span className={`status-pill ${STATUS_CLASS[row.status]}`}>{row.status}</span>
                   </td>
@@ -113,10 +116,6 @@ function SortableHeader({
       </button>
     </th>
   );
-}
-
-function formatInteger(value: number | null): string {
-  return value == null ? "-" : new Intl.NumberFormat("en-US").format(value);
 }
 
 function formatNumber(value: number | null): string {
