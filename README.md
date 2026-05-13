@@ -104,7 +104,9 @@ Recommended flow:
    - Install command: `npm install`
    - Build command: `npm run build`
    - Output: Vercel auto-detects Next.js
-5. Confirm the production site can read `/data/manifest.json` and CSV files under `/data/holdings`.
+5. Confirm the production page renders and CSV download routes under `/data/holdings` return CSV content.
+
+`data/manifest.json` is imported by server-side app code and is not exposed as a public URL.
 
 ## Current Publish Checklist
 
