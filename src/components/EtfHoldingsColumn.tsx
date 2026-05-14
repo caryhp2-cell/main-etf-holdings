@@ -1,10 +1,12 @@
 import type { EtfCode, HoldingRow, HoldingStatus } from "../holdings/types";
 import type { HoldingsSort, SortKey } from "../holdings/sortHoldings";
 import { formatChangePercent, formatShareDeltaLots } from "../holdings/formatHoldingValues";
+import { toRepeatedActionKey } from "../holdings/repeatedActionSymbols";
 
 interface EtfHoldingsColumnProps {
   etfCode: EtfCode;
   rows: HoldingRow[];
+  repeatedActionSymbols: Set<string>;
   sort: HoldingsSort;
   onSort: (key: SortKey) => void;
 }
@@ -17,7 +19,13 @@ const STATUS_CLASS: Record<HoldingStatus, string> = {
   未知: "status-unknown",
 };
 
-export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsColumnProps) {
+export function EtfHoldingsColumn({
+  etfCode,
+  rows,
+  repeatedActionSymbols,
+  sort,
+  onSort,
+}: EtfHoldingsColumnProps) {
   const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
   const additions = rows.filter((row) => row.status === "新增" || row.status === "加碼").length;
   const reductions = rows.filter((row) => row.status === "減碼").length;
@@ -80,23 +88,32 @@ export function EtfHoldingsColumn({ etfCode, rows, sort, onSort }: EtfHoldingsCo
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
-                <tr key={`${row.etfCode}-${row.symbol}`}>
-                  <td className="symbol">{row.symbol}</td>
-                  <td>{row.name}</td>
-                  <td className="numeric">{row.weight.toFixed(2)}%</td>
-                  <td className={priceClass(row.closePrice)}>{formatNumber(row.closePrice)}</td>
-                  <td className={changeClass(row.changePercent)}>
-                    {formatChangePercent(row.changePercent)}
-                  </td>
-                  <td className={deltaClass(row.shareDelta)}>
-                    {formatShareDeltaLots(row.shareDelta)}
-                  </td>
-                  <td>
-                    <span className={`status-pill ${STATUS_CLASS[row.status]}`}>{row.status}</span>
-                  </td>
-                </tr>
-              ))}
+              {rows.map((row) => {
+                const isRepeatedAction =
+                  isActionStatus(row.status) &&
+                  repeatedActionSymbols.has(toRepeatedActionKey(row.symbol, row.status));
+
+                return (
+                  <tr
+                    className={isRepeatedAction ? "repeated-action-row" : undefined}
+                    key={`${row.etfCode}-${row.symbol}`}
+                  >
+                    <td className="symbol">{row.symbol}</td>
+                    <td>{row.name}</td>
+                    <td className="numeric">{row.weight.toFixed(2)}%</td>
+                    <td className={priceClass(row.closePrice)}>{formatNumber(row.closePrice)}</td>
+                    <td className={changeClass(row.changePercent)}>
+                      {formatChangePercent(row.changePercent)}
+                    </td>
+                    <td className={deltaClass(row.shareDelta)}>
+                      {formatShareDeltaLots(row.shareDelta)}
+                    </td>
+                    <td>
+                      <span className={`status-pill ${STATUS_CLASS[row.status]}`}>{row.status}</span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -147,4 +164,8 @@ function changeClass(value: number | null): string {
 function deltaClass(value: number | null): string {
   if (value == null || value === 0) return "numeric value-blue";
   return value > 0 ? "numeric value-blue" : "numeric value-orange";
+}
+
+function isActionStatus(status: HoldingStatus): boolean {
+  return status === "加碼" || status === "減碼";
 }

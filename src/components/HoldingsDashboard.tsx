@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { findRepeatedActionSymbols } from "../holdings/repeatedActionSymbols";
 import { sortHoldingsRows, type HoldingsSort, type SortKey } from "../holdings/sortHoldings";
 import { DISPLAY_ETF_CODES, type EtfCode, type HoldingRow } from "../holdings/types";
 import { EtfHoldingsColumn } from "./EtfHoldingsColumn";
@@ -15,6 +16,7 @@ export function HoldingsDashboard({ holdingsByEtf }: HoldingsDashboardProps) {
     key: "weight",
     direction: "desc",
   });
+  const repeatedActionSymbols = findRepeatedActionSymbols(holdingsByEtf);
 
   function requestSort(key: SortKey) {
     setSort((current) => ({
@@ -30,6 +32,7 @@ export function HoldingsDashboard({ holdingsByEtf }: HoldingsDashboardProps) {
           key={etfCode}
           etfCode={etfCode}
           rows={sortHoldingsRows(holdingsByEtf[etfCode], sort)}
+          repeatedActionSymbols={repeatedActionSymbols}
           sort={sort}
           onSort={requestSort}
         />

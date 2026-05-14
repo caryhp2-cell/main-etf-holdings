@@ -279,6 +279,14 @@ tbody tr:hover {
   background: rgba(23, 105, 255, 0.045);
 }
 
+tbody tr.repeated-action-row {
+  background: rgba(125, 188, 255, 0.18);
+}
+
+tbody tr.repeated-action-row:hover {
+  background: rgba(125, 188, 255, 0.28);
+}
+
 .sort-button {
   align-items: center;
   background: transparent;
